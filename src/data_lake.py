@@ -54,6 +54,7 @@ class DataLake:
         access_key: int = -1,
         processed: bool = False,
         metadata: Optional[Dict] = None,
+        force: bool = False  # Optional parameter to bypass overwrite prompt
     ):
         """
         Store a dataset in the Data Lake using pickle, supporting structured, semi-structured, and unstructured data.
@@ -64,24 +65,33 @@ class DataLake:
             access_key (int): Access key to edit the data.
             processed (bool): Flag indicating if the data is processed.
             metadata (Optional[Dict]): Additional metadata for the dataset.
+            force (bool): If True, bypass overwrite confirmation prompt.
         """
         file_path = None
         data_type = type(data).__name__
-        file_size = 0
         data_structure = {}
+
+        # Check if dataset already exists
         if dataset_name in self.metadata:
-            print(f"Dataset '{dataset_name}' already exists. Do you want to update the data.")
-            response = input("Type Yes to proceed...")
-            if response.lower() != "yes":
-                print("Data not stored.")
-                return
+            if not force:
+                print(f"Dataset '{dataset_name}' already exists. Do you want to update the data?")
+                response = input("Type 'yes' to proceed: ").strip().lower()
+                if response != "yes":
+                    print("Data not stored.")
+                    return
+            else:
+                print(f"Overwriting existing dataset '{dataset_name}'...")
+
+        # Generate file path
         try:
             file_path = self.__get_file_path(dataset_name, processed)
         except Exception as e:
             print(f"Failed to get file path: {e}")
             return
+
+        # Collect metadata
+        modification_time = datetime.now().isoformat()
         try:
-            # Additional metadata for structured data (if it's a DataFrame)
             if isinstance(data, pd.DataFrame):
                 data_structure = {
                     "columns": list(data.columns),
@@ -89,49 +99,43 @@ class DataLake:
                     "row_count": len(data),
                     "index": data.index.name,
                 }
-            # General metadata for semi-structured data (dict, list)
             elif isinstance(data, (dict, list)):
                 data_structure = {"data_type": "JSON-like", "item_count": len(data)}
-
-            # General metadata for unstructured data
             elif isinstance(data, (str, bytes)):
                 data_structure = {"data_type": "Text/Binary"}
 
-            # Get file size
-            file_size = os.path.getsize(file_path)
-        except Exception as e:
-            print(f"Failed to create data structure: {e}")
-            data_structure = {}
-
-        # Collect metadata
-        modification_time = datetime.now().isoformat()
-        try:
-            # Create a temporary metadata dictionary
             temp_metadata = metadata or {}
-            temp_metadata["Author"] = DataLake.secured_access.get(access_key, "Unknown")
-            temp_metadata["processed"] = processed
-            temp_metadata["file_size"] = f"{file_size / 1024:.2f} KB" if file_size else "Unknown"
-            temp_metadata["modification_time"] = modification_time
-            temp_metadata["data_type"] = data_type
-            temp_metadata["data_structure"] = data_structure
+            temp_metadata.update({
+                "Author": DataLake.secured_access.get(access_key, "Unknown"),
+                "processed": processed,
+                "modification_time": modification_time,
+                "data_type": data_type,
+                "data_structure": data_structure,
+            })
 
         except Exception as e:
             print(f"Failed to create metadata for dataset '{dataset_name}': {e}")
-            # Do not update metadata
-            print("Metadata not updated. Data not stored")
+            print("Metadata not updated. Data not stored.")
             return
 
+        # Write data and update metadata
         try:
             with open(file_path, "wb") as f:
                 pickle.dump(data, f)
                 print(f"Data stored at: {file_path}")
-                # Assign the metadata only if no exception occurs
-                self.metadata[dataset_name] = temp_metadata
-                print(f"Metadata updated: {self.metadata[dataset_name]}")
+
+            # Update file size metadata
+            file_size = os.path.getsize(file_path) if os.path.exists(file_path) else 0
+            temp_metadata["file_size"] = f"{file_size / 1024:.2f} KB" if file_size else "Unknown"
+
+            # Assign metadata
+            self.metadata[dataset_name] = temp_metadata
+            print(f"Metadata updated: {self.metadata[dataset_name]}")
+
         except Exception as e:
             print(f"Failed to store data: {e}")
             print("Data not stored.")
-            return
+
         
     @access_decorator
     def retrieve_data(self, dataset_name: str, access_key: int = -1, processed: bool = False) -> Optional[Any]:
