@@ -15,4 +15,4 @@ This project is a collaborative effort to design and implement a data platform t
 ## How to Collaborate
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/data-platform-quant-research.git
+   git clone https://github.com/andyandikko/data-platform-quant-research.git
