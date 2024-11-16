@@ -35,7 +35,7 @@ class DataLake:
             str: File path.
         """
         folder = "processed" if processed else "raw"
-        return os.path.join(self.base_path, folder, f"{dataset_name}.parquet")
+        return os.path.join(self.base_path, folder, f"{dataset_name}.pkl")
     
     @staticmethod
     def access_decorator(func):
@@ -75,11 +75,12 @@ class DataLake:
             if response.lower() != "yes":
                 print("Data not stored.")
                 return
-
         try:
-            file_path = self.__get_file_path(dataset_name, "pkl", processed)
-            with open(file_path, "wb") as f:
-                pickle.dump(data, f)
+            file_path = self.__get_file_path(dataset_name, processed)
+        except Exception as e:
+            print(f"Failed to get file path: {e}")
+            return
+        try:
             # Additional metadata for structured data (if it's a DataFrame)
             if isinstance(data, pd.DataFrame):
                 data_structure = {
@@ -98,27 +99,40 @@ class DataLake:
 
             # Get file size
             file_size = os.path.getsize(file_path)
-
         except Exception as e:
-            print(f"Failed to store data: {e}")
-            file_path = None  # Data not stored
-            print("Data not stored.")
-            return
+            print(f"Failed to create data structure: {e}")
+            data_structure = {}
 
         # Collect metadata
         modification_time = datetime.now().isoformat()
-        self.metadata[dataset_name] = metadata or {}
-        self.metadata[dataset_name]["Author"] = DataLake.secured_access.get(access_key, "Unknown")
-        self.metadata[dataset_name]["processed"] = processed
-        self.metadata[dataset_name]["file_size"] = f"{file_size / 1024:.2f} KB" if file_size else "Unknown"
-        self.metadata[dataset_name]["modification_time"] = modification_time
-        self.metadata[dataset_name]["data_type"] = data_type
-        self.metadata[dataset_name]["data_structure"] = data_structure
+        try:
+            # Create a temporary metadata dictionary
+            temp_metadata = metadata or {}
+            temp_metadata["Author"] = DataLake.secured_access.get(access_key, "Unknown")
+            temp_metadata["processed"] = processed
+            temp_metadata["file_size"] = f"{file_size / 1024:.2f} KB" if file_size else "Unknown"
+            temp_metadata["modification_time"] = modification_time
+            temp_metadata["data_type"] = data_type
+            temp_metadata["data_structure"] = data_structure
 
-        # Print metadata and file path
-        if file_path:
-            print(f"Data stored at: {file_path}")
-        print(f"Metadata updated: {self.metadata[dataset_name]}")
+        except Exception as e:
+            print(f"Failed to create metadata for dataset '{dataset_name}': {e}")
+            # Do not update metadata
+            print("Metadata not updated. Data not stored")
+            return
+
+        try:
+            with open(file_path, "wb") as f:
+                pickle.dump(data, f)
+                print(f"Data stored at: {file_path}")
+                # Assign the metadata only if no exception occurs
+                self.metadata[dataset_name] = temp_metadata
+                print(f"Metadata updated: {self.metadata[dataset_name]}")
+        except Exception as e:
+            print(f"Failed to store data: {e}")
+            print("Data not stored.")
+            return
+        
     @access_decorator
     def retrieve_data(self, dataset_name: str, access_key: int = -1, processed: bool = False) -> Optional[Any]:
         """
