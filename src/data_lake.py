@@ -10,7 +10,7 @@ import sqldf
 
 
 class DataLake:
-    secured_access = {134:"Andy", 245: "Matt", 367: "Harry"}
+    secured_access = {134:"Andy", 245: "Matheus", 367: "Harrison"}
     def __init__(self, base_path: str = "data_lake"):
         """
         Initialize the Data Lake.
