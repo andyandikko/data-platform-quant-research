@@ -1,10 +1,10 @@
 {
     "market_data_example": {
         "model_type": "intraday",
-        "created_at": "2024-11-17T17:02:53.044988",
+        "created_at": "2024-11-17T17:33:41.211949",
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:02:53.053186",
+        "modification_time": "2024-11-17T17:33:41.235551",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
@@ -31,10 +31,10 @@
     },
     "news_data_example": {
         "model_type": "news",
-        "created_at": "2024-11-17T17:02:53.578820",
+        "created_at": "2024-11-17T17:33:41.752711",
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:02:56.042125",
+        "modification_time": "2024-11-17T17:33:44.196800",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
@@ -80,7 +80,7 @@
     },
     "spy_intraday": {
         "model_type": "intraday",
-        "created_at": "2024-11-17T17:02:56.193818",
+        "created_at": "2024-11-17T17:33:44.305833",
         "ticker": "SPY",
         "interval": "1m",
         "start_date": "2024-11-15 09:30:00-05:00",
@@ -88,7 +88,7 @@
         "rows": 389,
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:02:56.294495",
+        "modification_time": "2024-11-17T17:33:44.409049",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
@@ -126,7 +126,7 @@
     "spy_intraday_transformed": {
         "Author": "Andy",
         "processed": true,
-        "modification_time": "2024-11-17T17:02:56.301517",
+        "modification_time": "2024-11-17T17:33:44.409049",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
@@ -204,14 +204,20 @@
         "description": "Sample intraday data for event study",
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:23:32.301863",
+        "modification_time": "2024-11-17T17:32:53.792826",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
-                "timestamp\tprice\tvolume\tsymbol"
+                "timestamp",
+                "price",
+                "volume",
+                "symbol"
             ],
             "data_types": {
-                "timestamp\tprice\tvolume\tsymbol": "object"
+                "timestamp": "datetime64[ns]",
+                "price": "float64",
+                "volume": "int64",
+                "symbol": "object"
             },
             "row_count": 43201,
             "index": null
@@ -222,14 +228,20 @@
         "description": "Sample news data for event study",
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:23:32.328012",
+        "modification_time": "2024-11-17T17:32:53.813220",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
-                "timestamp\theadline\trelevance\tsource"
+                "timestamp",
+                "headline",
+                "relevance",
+                "source"
             ],
             "data_types": {
-                "timestamp\theadline\trelevance\tsource": "object"
+                "timestamp": "datetime64[ns]",
+                "headline": "object",
+                "relevance": "float64",
+                "source": "object"
             },
             "row_count": 31,
             "index": null

@@ -175,6 +175,28 @@
                 }
             },
             "catalog_owner": "Andy"
+        },
+        {
+            "name": "intraday_data_event_study",
+            "metadata": {
+                "type": "intraday",
+                "description": "Sample intraday data for event study",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T17:28:31.160677",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp\tprice\tvolume\tsymbol"
+                    ],
+                    "data_types": {
+                        "timestamp\tprice\tvolume\tsymbol": "object"
+                    },
+                    "row_count": 43201,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
         }
     ],
     "EventStudy/News": [
@@ -186,6 +208,28 @@
                 "Author": "Andy",
                 "processed": false,
                 "modification_time": "2024-11-17T17:16:18.177753",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp\theadline\trelevance\tsource"
+                    ],
+                    "data_types": {
+                        "timestamp\theadline\trelevance\tsource": "object"
+                    },
+                    "row_count": 31,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
+        },
+        {
+            "name": "news_data_event_study",
+            "metadata": {
+                "type": "news",
+                "description": "Sample news data for event study",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T17:28:31.176311",
                 "data_type": "DataFrame",
                 "data_structure": {
                     "columns": [
