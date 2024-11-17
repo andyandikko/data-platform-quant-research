@@ -1,3 +1,86 @@
+"""
+### DataCatalog Class Explanation
+
+The `DataCatalog` class extends the functionality of the `DataLake` class, providing enhanced features for managing datasets organized into categories. It introduces cataloging, searching, and security mechanisms to facilitate efficient dataset management.
+
+---
+
+#### Key Features
+
+1. **Category Management**:
+   - The class allows for the creation of categories to logically group datasets.
+   - Each category can contain multiple datasets, each with its associated metadata.
+
+2. **Dataset Management**:
+   - Datasets can be added to specific categories along with their metadata.
+   - Existing datasets can be listed, searched, or removed from categories.
+
+3. **Metadata Integration**:
+   - The class integrates with the `DataLake` to fetch metadata for datasets stored in the lake.
+   - Metadata helps provide additional context and information for each dataset.
+
+4. **Access Control**:
+   - Uses a `secured_access` dictionary to manage permissions for catalog operations.
+   - Only authorized users (identified by `access_key`) can perform catalog actions.
+
+5. **Advanced Search**:
+   - Enables searching for datasets across all categories based on keywords.
+   - Search results include matching datasets along with their categories and metadata.
+
+6. **Persistence**:
+   - Categories and datasets are stored persistently in a JSON file (`categories.json`).
+   - Changes to categories are saved automatically for future retrieval.
+
+---
+
+#### Security Features
+
+- **Access Control with Decorators**:
+  - The `catalog_access_decorator` ensures that only users with valid `access_key` can interact with the catalog.
+  - Unauthorized users receive an "Access Denied" message.
+
+- **Ownership Enforcement**:
+  - Datasets added to categories are marked with the owner's identity (based on `access_key`).
+  - Only the owner or an authorized user can remove a dataset from a category.
+
+---
+
+#### Advanced Search Functionality
+
+- The `search_datasets` method provides robust search capabilities:
+  - Searches by keyword across all categories.
+  - Matches are based on dataset names or metadata content.
+  - Results include dataset name, category, metadata, and owner information.
+
+---
+
+#### Detailed Method Overview
+
+1. **`add_category`**:
+   - Adds a new category to the catalog if it doesn't already exist.
+   - Saves the updated categories to the `categories.json` file.
+
+2. **`add_dataset_to_category`**:
+   - Adds a dataset to a specified category.
+   - Fetches metadata from the `DataLake` if not provided.
+   - Ensures the dataset is not duplicated in the category.
+
+3. **`list_datasets_in_category`**:
+   - Lists all datasets within a specified category.
+
+4. **`search_datasets`**:
+   - Searches for datasets across all categories based on a keyword.
+   - Returns detailed information about matching datasets.
+
+5. **`remove_from_category`**:
+   - Removes a dataset from a specified category.
+   - Ensures that only the dataset owner can perform the removal.
+
+6. **`_load_categories` and `_save_categories`**:
+   - Internal methods for loading and saving the catalog data persistently.
+   
+"""
+
 from typing import Any, Dict, List, Optional
 import json
 from src.DataLake import DataLake

@@ -204,7 +204,7 @@
         "description": "Sample intraday data for event study",
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:32:53.792826",
+        "modification_time": "2024-11-17T17:47:34.272677",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [
@@ -228,7 +228,7 @@
         "description": "Sample news data for event study",
         "Author": "Andy",
         "processed": false,
-        "modification_time": "2024-11-17T17:32:53.813220",
+        "modification_time": "2024-11-17T17:47:34.285229",
         "data_type": "DataFrame",
         "data_structure": {
             "columns": [

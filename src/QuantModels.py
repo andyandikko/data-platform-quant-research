@@ -1,3 +1,254 @@
+"""
+# **Detailed Explanation of IntradayDataModel and NewsDataModel**
+
+## **Overview**
+The `IntradayDataModel` and `NewsDataModel` are specialized Python classes designed to handle and analyze financial data. These models are part of a Quantitative Analysis platform that utilizes a modular approach with components like:
+- **DataWorkbench**: Handles data storage and retrieval.
+- **QuantModels**: Provides domain-specific data manipulation and analysis functionalities.
+
+---
+
+## **1. IntradayDataModel**
+
+### **Purpose**
+The `IntradayDataModel` is designed to process and analyze intraday financial data, such as stock prices and volumes. It supports features like technical indicator calculation, transformations, and VWAP (Volume Weighted Average Price) analysis.
+
+### **Required Columns**
+The following columns must exist in the intraday data for it to be valid:
+- `timestamp`
+- `price`
+- `volume`
+- `symbol`
+
+### **Key Features and Methods**
+
+#### **Initialization**
+```python
+def __init__(self, data: Optional[pd.DataFrame] = None)
+```
+Initializes the model with optional input data and metadata, such as creation time and model type.
+
+---
+
+#### **Data Validation**
+```python
+def validate_data(self) -> bool
+```
+Validates if the required columns are present in the dataset.
+
+---
+
+#### **Technical Indicators**
+```python
+@staticmethod
+def create_technical_indicators() -> List[Callable]
+```
+Generates common technical indicators such as:
+- SMA (Simple Moving Average)
+- EMA (Exponential Moving Average)
+- Bollinger Bands
+- RSI (Relative Strength Index)
+- MACD (Moving Average Convergence Divergence)
+
+---
+
+#### **Data Loading**
+```python
+def load_from_yfinance(self, ticker: str, start: str, end: str, interval: str = "1m", period: str = None, add_indicators: bool = False)
+```
+Fetches data from Yahoo Finance and supports:
+- Date range (`start`, `end`) or a fixed `period`.
+- Adding pre-defined technical indicators.
+
+Returns a `TransformationResult` containing:
+- Transformed data
+- Metadata
+- Success or failure message
+
+---
+
+#### **VWAP Calculation**
+```python
+@staticmethod
+def vwap_calculation(data: pd.DataFrame) -> pd.DataFrame
+```
+Calculates the VWAP, which is essential for intraday price analysis.
+
+---
+
+#### **Volatility Calculation**
+```python
+@staticmethod
+def volatility_calculation(window: int = 20) -> Callable
+```
+Returns a transformation function to calculate rolling volatility over a specified window.
+
+---
+
+#### **Transformations**
+```python
+def apply_transformations(self, transformations: List[Callable], update_data: bool = True) -> TransformationResult
+```
+Applies a series of transformations to the data. Logs each transformation step and updates the model's data if `update_data=True`.
+
+---
+
+#### **Export to Workbench**
+```python
+def to_workbench(self, workbench: DataWorkbench, dataset_name: str, access_key: int)
+```
+Stores the processed data into the `DataWorkbench`.
+
+---
+
+#### **Load from Workbench**
+```python
+@classmethod
+def from_workbench(cls, workbench: DataWorkbench, dataset_name: str, access_key: int)
+```
+Loads the model from data stored in the `DataWorkbench`.
+
+---
+
+## **2. NewsDataModel**
+
+### **Purpose**
+The `NewsDataModel` is designed to process financial news and extract insights using sentiment analysis and named entity recognition (NER).
+
+### **Required Columns**
+The following columns must exist in the news data for it to be valid:
+- `timestamp`
+- `headline`
+- `relevance`
+
+### **Key Features and Methods**
+
+#### **Initialization**
+```python
+def __init__(self, data: Optional[pd.DataFrame] = None, model_name="bert-base-uncased")
+```
+Initializes the model with:
+- Pre-trained **BERT** models for sentiment analysis and NER.
+- Optional input data and metadata.
+
+---
+
+#### **Data Validation**
+```python
+def validate_data(self) -> bool
+```
+Validates if the required columns are present in the dataset.
+
+---
+
+#### **Text Cleaning**
+```python
+@staticmethod
+def clean_text(text: str) -> str
+```
+Preprocesses the text by removing special characters and converting it to lowercase.
+
+---
+
+#### **Sentiment Analysis**
+```python
+def predict_sentiment(self, text: str) -> float
+```
+Uses a pre-trained BERT model to predict the sentiment score (0 for negative, 1 for positive).
+
+---
+
+#### **Entity Extraction**
+```python
+def extract_entities(self, text: str) -> List[str]
+```
+Extracts named entities (e.g., company names, financial terms) using BERT's NER pipeline.
+
+---
+
+#### **Article Analysis**
+```python
+def analyze_articles(self) -> TransformationResult
+```
+Processes all articles in the dataset:
+- Calculates sentiment scores for headlines.
+- Extracts entities from the text.
+- Logs the analysis step.
+
+Returns a `TransformationResult`.
+
+---
+
+#### **Top Headlines**
+```python
+def get_top_headlines(self, n: int = 5) -> pd.DataFrame
+```
+Fetches the top N headlines based on sentiment scores.
+
+---
+
+#### **Export to Workbench**
+```python
+def to_workbench(self, workbench: DataWorkbench, dataset_name: str, access_key: int)
+```
+Stores the processed data into the `DataWorkbench`.
+
+---
+
+#### **Load from Workbench**
+```python
+@classmethod
+def from_workbench(cls, workbench: DataWorkbench, dataset_name: str, access_key: int)
+```
+Loads the model from data stored in the `DataWorkbench`.
+
+---
+
+## **Workflow: Integrating IntradayDataModel and NewsDataModel**
+
+1. **Data Ingestion**
+   - Use `load_from_yfinance` for intraday data or load data directly from `DataWorkbench`.
+   - Load news data with `analyze_articles` for sentiment scoring and NER.
+
+2. **Transformation**
+   - Apply transformations such as VWAP and returns calculation to intraday data.
+   - Extract sentiment scores and entities from news data.
+
+3. **Analysis**
+   - Merge datasets on the `timestamp` field using pandas' `merge_asof`.
+   - Calculate correlations or impacts (e.g., sentiment impact on price returns).
+
+4. **Export and Storage**
+   - Save processed data to the `DataWorkbench`.
+   - Use the `DataCatalog` for organizing and searching datasets.
+
+---
+
+## **Potential Use Cases**
+
+1. **Intraday Trading Strategies**
+   - Calculate VWAP and RSI for entry/exit signals.
+   - Analyze price trends using rolling volatility.
+
+2. **Event Studies**
+   - Study the effect of major news headlines on intraday price movements.
+   - Measure sentiment impact on returns.
+
+3. **Portfolio Optimization**
+   - Integrate sentiment-driven adjustments into portfolio weights.
+   - Use intraday volatility as a risk factor.
+
+4. **Data-Driven Alerts**
+   - Generate alerts for high sentiment-impact events.
+   - Track unusual intraday price and volume patterns.
+
+---
+
+## **Conclusion**
+The `IntradayDataModel` and `NewsDataModel` classes are designed to handle distinct but complementary aspects of financial data. Together, they provide a robust framework for analyzing the relationship between market movements and news events. By integrating with the `DataWorkbench` and `DataCatalog`, these models ensure seamless data management and reproducibility.
+
+"""
+
 from typing import Any, Dict, List, Optional, Callable, Union, Tuple
 import pandas as pd
 import numpy as np

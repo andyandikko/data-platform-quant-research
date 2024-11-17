@@ -1,8 +1,77 @@
+"""
+# Event Study Script - Report and Workflow Explanation
+
+## Overview
+This Python script demonstrates an **Event Study Analysis** by utilizing a set of classes and platform components. It evaluates the impact of news sentiment on intraday stock price movements. The script is structured as follows:
+
+1. **Data Preparation and Validation**: Load, clean, and validate data for intraday prices and news events.
+2. **Platform Initialization**: Leverage `DataWorkbench` and `DataCatalog` for data storage and management.
+3. **Quantitative Modeling**: Use `IntradayDataModel` and `NewsDataModel` to process and analyze the data.
+4. **Data Analysis**: Merge datasets and calculate the sentiment impact on stock returns.
+
+## Workflow Components
+
+### 1. `IntradayDataModel` and `NewsDataModel`
+These are specialized models for working with financial intraday data and news data.
+
+- **`IntradayDataModel`**:
+  - The IntradayDataModel is designed to process and analyze intraday financial data, such as stock prices and volumes. 
+  - It supports features like technical indicator calculation, transformations, and VWAP (Volume Weighted Average Price) analysis.
+  - Provides methods like `vwap_calculation` to compute VWAP (Volume Weighted Average Price).   
+  - Allows transformations on intraday data, such as calculating returns.
+  - We leveraged the ta library for technical analysis calculations and current workflow can be extended to include more technical indicators.
+
+- **`NewsDataModel`**:
+  - Enables sentiment analysis and entity extraction from news headlines, using a pretrained bert model.
+  - Natural language processing allowing sentiment analysis and entity extraction.
+
+### 2. `DataWorkbench`
+This is the central component for storing and retrieving datasets. Key features include:
+- **Data Storage**: Stores raw and processed data into a structured DataLake.
+- **Transformation Support**: Facilitates applying transformations to datasets.
+
+### 3. `DataCatalog`
+The `DataCatalog` organizes datasets into searchable categories, allowing easy retrieval for event studies or other workflows.
+
+## Workflow Steps
+
+### Step 1: Data Loading and Preparation
+- **Data Sources**: Intraday and news data are loaded from `.txt` files.
+- **Datetime Parsing**: Timestamps are converted to datetime objects for accurate alignment.
+- **Validation**: Ensures all required columns (`timestamp`, `price`, etc.) are present in the datasets.
+
+### Step 2: Data Storage
+- The `DataWorkbench` stores the datasets into a DataLake:
+  - `intraday_data_event_study`
+  - `news_data_event_study`
+- Metadata (e.g., data type and description) is associated with each dataset.
+- Datasets are added to the `DataCatalog` under organized categories.
+
+### Step 3: Data Retrieval and Processing
+- Data is retrieved from the DataLake and loaded into the respective Quant Models:
+  - **Intraday Data**: Processed with VWAP and returns calculations.
+  - **News Data**: Analyzed for sentiment scores and extracted entities.
+
+### Step 4: Data Merging
+- **Alignment**: Intraday and news data are merged based on timestamps using `pd.merge_asof`, allowing a backward merge for news impact analysis.
+- **Sentiment Impact**: Calculates the effect of sentiment on stock returns using the formula:
+  \\\[ \text{sentiment\_impact} = \text{returns} \times \text{sentiment\_score} \\\]
+
+### Step 5: Summary Analysis
+- Aggregates results by headline, calculating average `sentiment_impact` and `returns` for each news event.
+
+## Outputs
+1. **Merged Data**: A dataset combining intraday and news data with sentiment impacts.
+2. **Summary Results**: Displays aggregated sentiment impact and returns per headline.
+
+## Error Handling
+
 import pandas as pd
 from src.QuantModels import IntradayDataModel, NewsDataModel
 from src.DataWorkbench import DataWorkbench
 from src.DataCatalog import DataCatalog
 
+"""
 
 def main():
     # Define paths to the sample data files

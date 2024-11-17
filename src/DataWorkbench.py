@@ -1,3 +1,63 @@
+"""
+Explanation of DataWorkbench Class
+
+The DataWorkbench class extends the functionality of the DataLake class to enhance data management capabilities by adding in-memory storage, transformation functionalities, and processing logs. It integrates well with the existing DataLake for seamless data retrieval and storage. Below is a concise explanation of its components and functionalities.
+
+---
+
+Key Features
+
+1. In-Memory Storage:
+   - Stores datasets temporarily in memory for quick access.
+   - Includes metadata about the datasets such as storage time and additional properties.
+
+   Key Methods:
+   - store_data_in_memory: Saves data and metadata in memory for efficient retrieval.
+   - retrieve_data_in_memory: Fetches data from memory and validates it if necessary.
+   - clean_memory_storage: Cleans in-memory data storage based on a timestamp or completely clears it.
+
+---
+
+2. Transformation Management:
+   - Allows registering transformation functions and applying them to datasets.
+   - Supports both single and chained transformations.
+   - Transformations can be applied in memory or stored in the DataLake.
+
+   Key Methods:
+   - register_transformation: Registers a named transformation with optional metadata (e.g., description).
+   - transform_data: Applies a single transformation (by name or function) to a dataset, with options to store the transformed data.
+   - chain_transformations: Applies multiple transformations sequentially, with options to store the final output in the DataLake.
+
+---
+
+3. Processing Logs:
+   - Tracks all transformations applied to datasets, including the timestamp and transformation details.
+   - Useful for auditing and debugging transformation workflows.
+
+   Key Methods:
+   - _log_processing: Internally logs each transformation step applied to a dataset.
+   - get_processing_history: Retrieves the processing history for a specific dataset or all datasets.
+
+---
+
+How It Works
+
+1. Data Storage:
+   - Data can be stored in memory or in the DataLake for persistent storage.
+   - Metadata about the datasets is maintained alongside the data.
+
+2. Transformations:
+   - Users can define custom transformations (e.g., lambda df: df.assign(new_col=df['existing_col'] * 2)).
+   - These transformations can be applied either individually or chained together for complex workflows.
+   - Transformed data can be saved back to the DataLake or retained in memory for subsequent use.
+
+3. Integration with DataLake:
+   - The class builds on the capabilities of the DataLake for persistent storage and metadata handling.
+   - It leverages DataLake methods to store and retrieve datasets while adding in-memory options and processing logs.
+
+---
+"""
+
 from typing import Any, Dict, List, Optional, Callable, Union
 import pandas as pd
 import numpy as np

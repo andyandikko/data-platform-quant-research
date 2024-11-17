@@ -1,3 +1,54 @@
+"""
+# DataLake Class Explanation
+
+## Overview
+The `DataLake` class provides a comprehensive framework for managing datasets in a file-based Data Lake. It allows for storing, retrieving, managing metadata, and querying datasets using SQL. The design emphasizes security via access keys and supports both raw and processed datasets.
+Note the security feature that restricts access to certain methods based on the access key provided. Tested using unit tests.
+---
+
+## Key Features and Methods
+
+### 1. Initialization (`__init__`)
+- Creates the base directory (`data_lake` by default).
+- Initializes folders for raw and processed data.
+- Loads metadata from a `metadata.json` file.
+
+### 2. Metadata Management
+- **`_load_metadata`:** Loads dataset metadata from the JSON file.
+- **`_save_metadata`:** Saves metadata back to the file after any changes.
+- Metadata includes details like dataset structure, author, processing status, and timestamps.
+
+### 3. File Path Construction
+- **`__get_file_path`:** Constructs file paths for datasets based on their name and whether they are raw or processed.
+
+### 4. Data Storage and Retrieval
+- **`store_data`:** 
+  - Saves datasets (DataFrame, dict, list, or text/binary) to disk.
+  - Updates metadata with details like data structure and author.
+  - Prevents overwriting unless `force=True` is specified.
+
+- **`retrieve_data`:**
+  - Fetches datasets from disk based on their name and type (raw or processed).
+
+### 5. Security: Access Control
+- **`access_decorator`:** 
+  - Ensures that only users with valid access keys can call restricted methods like `store_data`, `retrieve_data`, or `delete_dataset`.
+
+### 6. SQL Query Execution
+- **`execute_sql`:**
+  - Executes SQL queries across all loaded DataFrames in the Data Lake.
+  - Uses the `pandasql` library for SQL-like querying.
+
+### 7. Dataset Management
+- **`list_datasets`:** Lists all available datasets, optionally filtering by processed or raw type.
+- **`delete_dataset`:** Deletes a dataset from both disk and metadata.
+
+### 8. Enhanced Metadata Retrieval
+- **`get_metadata`:**
+  - Fetches metadata for a specific dataset.
+  - Reloads metadata from the file if it's not found in memory.
+"""
+
 import os
 import json
 import pickle
