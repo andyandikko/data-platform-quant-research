@@ -4,7 +4,7 @@ import numpy as np
 import os
 import shutil
 from unittest.mock import patch, MagicMock
-from src.data_lake import DataLake
+from src.DataLake import DataLake
 
 class TestDataLake(unittest.TestCase):
     def setUp(self):
