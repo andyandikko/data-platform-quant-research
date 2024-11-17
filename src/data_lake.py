@@ -2,11 +2,12 @@ import numpy as np
 import pandas as pd
 import polars as pl 
 import os
-from typing import tuple, List, Dict,Optional, Any
+from typing import Tuple, List, Dict,Optional, Any
 import json
 import pickle
 import datetime
-import sqldf
+from pandasql import sqldf
+
 
 
 class DataLake:
@@ -90,7 +91,7 @@ class DataLake:
             return
 
         # Collect metadata
-        modification_time = datetime.now().isoformat()
+        modification_time = datetime.datetime.now().isoformat()
         try:
             if isinstance(data, pd.DataFrame):
                 data_structure = {
@@ -182,11 +183,29 @@ class DataLake:
             # Load all datasets into a namespace for querying
             namespace = {}
             for dataset_name, metadata in self.metadata.items():
-                file_path = self.__get_file_path(dataset_name, metadata["processed"])
-                if os.path.exists(file_path) and metadata["data_type"] == "DataFrame":
-                    namespace[dataset_name] = pickle.load(open(file_path, "rb"))
+                if metadata.get("data_type") == "DataFrame":  # Only load DataFrames
+                    file_path = self.__get_file_path(dataset_name, metadata["processed"])
+                    if os.path.exists(file_path):
+                        try:
+                            with open(file_path, "rb") as f:
+                                namespace[dataset_name] = pickle.load(f)
+                        except Exception as e:
+                            print(f"Failed to load DataFrame '{dataset_name}': {e}")
+                            return None
+            
+            if not namespace:
+                print("No DataFrame datasets available for SQL query")
+                return None
+
             # Execute SQL query using pandasql
-            return sqldf(sql_query, namespace)
+            result = sqldf(sql_query, namespace)
+            
+            if result is None or result.empty:
+                print("SQL query returned no results")
+                return None
+                
+            return result
+        
         except Exception as e:
             print(f"SQL query error: {e}")
             return None
