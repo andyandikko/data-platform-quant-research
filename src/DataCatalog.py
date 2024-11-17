@@ -1,198 +1,158 @@
-from src.DataLake import DataLake
 from typing import Any, Dict, List, Optional
+import json
 from src.DataLake import DataLake
-from typing import Any, Dict, List, Optional
+import os
+
+
+from functools import wraps
 
 class DataCatalog(DataLake):
-    def __init__(self, base_path: str = "data_lake") -> None:
-        """
-        Initialize the Data Catalog and Data Lake.
-        
-        Args:
-            base_path (str): Path to store raw and processed data.
-        """
-        super().__init__(base_path)  # Initialize the DataLake functionality
+    CATALOG_FILE = "categories.json"
+    secured_access = {134: "Andy", 245: "Matt", 367: "Harry"}
 
-        self._categories: Dict[str, Any] = {
-            "Data Category 1": {"datasets": []},
-            "Data Category 2": {"datasets": []},
-            "Data Category 3": {"datasets": []},
-            "Data Category 4": {"datasets": []},
-            "Company": {
-                "Company Financials": {
-                    "datasets": [],
-                    "Quarterly": {"datasets": []},
-                    "Annual": {"datasets": []}
-                },
-                "Company Level Actuals": {"datasets": []},
-                "Analyst Recommendations": {"datasets": []},
-                "Company Guidance": {"datasets": []}
-            },
-            "ESG": {
-                "Environmental": {
-                    "Carbon Emissions": {"datasets": []},
-                    "Climate Risk": {"datasets": []},
-                    "datasets": []
-                }
-            },
-            "Reference Data": {
-                "Classifications": {
-                    "Industry": {"datasets": []},
-                    "Region": {"datasets": []},
-                    "datasets": []
-                },
-                "Bloomberg Classifications": {"datasets": []}
-            },
-            "Equities/Funds": {
-                "Derivatives": {
-                    "Options": {"datasets": []},
-                    "Futures": {"datasets": []},
-                    "datasets": []
-                },
-                "Equity Futures": {"datasets": []},
-                "Pricing & Analytics": {"datasets": []}
-            },
-            "Fixed Income": {
-                "GSAC": {"datasets": []},
-                "Pricing & Analytics": {
-                    "Government": {"datasets": []},
-                    "Corporate": {"datasets": []},
-                    "datasets": []
-                },
-                "Pricing": {"datasets": []}
-            },
-            "Mortgages": {
-                "Pricing & Analytics": {
-                    "Residential": {"datasets": []},
-                    "Commercial": {"datasets": []},
-                    "datasets": []
-                },
-                "Analytics": {"datasets": []}
-            },
-            "Macro": {
-                "Economic Data": {
-                    "GDP": {"datasets": []},
-                    "Inflation": {"datasets": []},
-                    "datasets": []
-                },
-                "Country Headline Metrics": {"datasets": []},
-                "Actuals - Periodic": {"datasets": []}
-            }
-        }
-
-    @property
-    def category_names(self) -> List[str]:
-        """Get the list of main category names."""
-        return list(self._categories.keys())
-    
-    @property
-    def categories(self) -> Dict[str, Any]:
-        """Get the complete catalog structure."""
-        return self._categories
-
-    def _get_category_path(self, path: List[str]) -> Optional[Dict[str, Any]]:
-        """
-        Navigate to a specific path in the category structure.
-        
-        Args:
-            path (List[str]): List of category levels to navigate.
-            
-        Returns:
-            Optional[Dict[str, Any]]: The category dict at the specified path.
-        """
-        current = self._categories
-        for level in path:
-            if level not in current:
+    @staticmethod
+    def catalog_access_decorator(func):
+        """Decorator for catalog access control."""
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            access_key = kwargs.get("access_key", -1)
+            if access_key not in DataCatalog.secured_access:
+                print("Catalog Access Denied: Invalid access key.")
                 return None
-            current = current[level]
-        return current
+            return func(self, *args, **kwargs)
+        return wrapper
 
-    def list_subcategories(self, path: List[str]) -> List[str]:
+    def __init__(self, base_path: str = "data_lake") -> None:
+        super().__init__(base_path)
+        self.categories: Dict[str, List[Dict[str, Any]]] = self._load_categories()
+
+    def _load_categories(self) -> Dict[str, List[Dict[str, Any]]]:
+        if os.path.exists(DataCatalog.CATALOG_FILE):
+            try:
+                with open(DataCatalog.CATALOG_FILE, "r") as f:
+                    return json.load(f)
+            except Exception as e:
+                print(f"Failed to load categories: {e}")
+        return {}
+
+    def _save_categories(self) -> bool:
+        try:
+            with open(DataCatalog.CATALOG_FILE, "w") as f:
+                json.dump(self.categories, f, indent=4)
+                print("Categories saved successfully.")
+            return True
+        except Exception as e:
+            print(f"Failed to save categories: {e}")
+            return False
+
+    @catalog_access_decorator
+    def add_category(self, name: str, access_key: int = -1) -> bool:
         """
-        List all subcategories at a given path.
+        Add a new category to the catalog.
         
         Args:
-            path (List[str]): Path to the category level.
+            name (str): Name of the category.
+            access_key (int): Catalog access key to verify permission.
             
         Returns:
-            List[str]: List of subcategory names (excluding 'datasets' key).
+            bool: Success status of the operation.
         """
-        category = self._get_category_path(path)
-        if category and isinstance(category, dict):
-            return [k for k in category.keys() if k != "datasets"]
-        return []
+        try:
+            if name not in self.categories:
+                self.categories[name] = []
+                if self._save_categories():
+                    print(f"Category '{name}' added to the catalog.")
+                    return True
+            else:
+                print(f"Category '{name}' already exists.")
+            return False
+        except Exception as e:
+            print(f"Failed to add category: {e}")
+            return False
 
-    @DataLake.access_decorator
-    def add_dataset(
-        self, 
-        path: List[str],
-        dataset_name: str, 
+    @catalog_access_decorator
+    def add_dataset_to_category(
+        self,
+        category_name: str,
+        dataset_name: str,
         access_key: int = -1,
-        metadata: Optional[Dict] = None
-    ) -> None:
+        metadata: Optional[Dict] = None,
+        datalake_key: Optional[int] = None
+    ) -> bool:
         """
-        Add a dataset to a specific category path.
+        Add a dataset to a specific category.
         
         Args:
-            path (List[str]): Path to the category level.
-            dataset_name (str): Name of the dataset.
-            access_key (int): Access key to verify permission.
+            category_name (str): The category to add the dataset to.
+            dataset_name (str): The name of the dataset.
+            access_key (int): Catalog access key to verify permission.
             metadata (Optional[Dict]): Metadata associated with the dataset.
-        """
-        try:
-            category = self._get_category_path(path)
-            if not category:
-                print(f"Invalid category path: {'/'.join(path)}")
-                return
-
-            # Validate dataset exists in DataLake
-            if not self.get_metadata(dataset_name, access_key):
-                print(f"Dataset '{dataset_name}' not found in DataLake.")
-                return
-
-            # Get metadata
-            dataset_metadata = metadata if metadata else self.get_metadata(dataset_name, access_key)
-            
-            # Check if dataset already exists
-            if not "datasets" in category:
-                category["datasets"] = []
-                
-            if any(d.get("name") == dataset_name for d in category["datasets"]):
-                print(f"Dataset '{dataset_name}' already exists at path: {'/'.join(path)}")
-                return
-
-            # Add dataset
-            category["datasets"].append({
-                "name": dataset_name,
-                "metadata": dataset_metadata
-            })
-            print(f"Dataset '{dataset_name}' added to path: {'/'.join(path)}")
-
-        except Exception as e:
-            print(f"Failed to add dataset: {e}")
-
-    def get_datasets(self, path: List[str]) -> List[Dict[str, Any]]:
-        """
-        Get all datasets at a specific category path.
-        
-        Args:
-            path (List[str]): Path to the category level.
+            datalake_key (Optional[int]): Separate key for DataLake access if needed.
             
         Returns:
-            List[Dict[str, Any]]: List of datasets at the specified path.
+            bool: Success status of the operation.
         """
         try:
-            category = self._get_category_path(path)
-            if category and isinstance(category, dict):
-                return category.get("datasets", [])
+            if category_name not in self.categories:
+                print(f"Category '{category_name}' does not exist. Add the category first.")
+                return False
+
+            # Use separate DataLake key if provided
+            dl_key = datalake_key if datalake_key is not None else access_key
+            existing_metadata = super().get_metadata(dataset_name, access_key=dl_key)
+            if not existing_metadata:
+                print(f"Dataset '{dataset_name}' not found in DataLake.")
+                return False
+
+            dataset_metadata = metadata if metadata else existing_metadata
+
+            if any(dataset["name"] == dataset_name for dataset in self.categories[category_name]):
+                print(f"Dataset '{dataset_name}' already exists in category '{category_name}'.")
+                return False
+
+            self.categories[category_name].append({
+                "name": dataset_name,
+                "metadata": dataset_metadata,
+                "catalog_owner": DataCatalog.secured_access[access_key]
+            })
+            
+            if self._save_categories():
+                print(f"Dataset '{dataset_name}' added to category '{category_name}'.")
+                return True
+            return False
+
+        except Exception as e:
+            print(f"Failed to add dataset to category: {e}")
+            return False
+
+    @catalog_access_decorator
+    def list_datasets_in_category(
+        self,
+        category_name: str,
+        access_key: int = -1
+    ) -> List[str]:
+        """
+        List all datasets in a given category.
+        
+        Args:
+            category_name (str): The category to list datasets from.
+            access_key (int): Catalog access key to verify permission.
+            
+        Returns:
+            List[str]: List of dataset names.
+        """
+        try:
+            if category_name in self.categories:
+                return [dataset["name"] for dataset in self.categories[category_name]]
+            print(f"Category '{category_name}' not found.")
             return []
         except Exception as e:
-            print(f"Failed to get datasets: {e}")
+            print(f"Failed to list datasets: {e}")
             return []
 
-    @DataLake.access_decorator
+    @catalog_access_decorator
     def search_datasets(
-        self, 
+        self,
         keyword: str,
         access_key: int = -1
     ) -> List[Dict[str, Any]]:
@@ -201,77 +161,65 @@ class DataCatalog(DataLake):
         
         Args:
             keyword (str): Keyword to search for.
-            access_key (int): Access key to verify permission.
+            access_key (int): Catalog access key to verify permission.
             
         Returns:
-            List[Dict[str, Any]]: List of matching datasets with their full path.
+            List[Dict[str, Any]]: List of matching datasets with their categories.
         """
-        def search_recursive(category: Dict[str, Any], current_path: List[str]) -> List[Dict[str, Any]]:
-            results = []
-            
-            # Search datasets at current level
-            for dataset in category.get("datasets", []):
-                if (keyword in dataset["name"].lower() or 
-                    keyword in str(dataset["metadata"]).lower()):
-                    results.append({
-                        "name": dataset["name"],
-                        "path": current_path.copy(),
-                        "metadata": dataset["metadata"]
-                    })
-            
-            # Search in subcategories
-            for key, value in category.items():
-                if key != "datasets" and isinstance(value, dict):
-                    results.extend(search_recursive(value, current_path + [key]))
-                    
-            return results
-
         try:
-            keyword = keyword.lower()
             results = []
+            keyword = keyword.lower()
             
-            for category_name, category in self._categories.items():
-                results.extend(search_recursive(category, [category_name]))
-                
+            for category, datasets in self.categories.items():
+                for dataset in datasets:
+                    if keyword in dataset["name"].lower() or keyword in str(dataset["metadata"]).lower():
+                        results.append({
+                            "name": dataset["name"],
+                            "category": category,
+                            "metadata": dataset["metadata"],
+                            "catalog_owner": dataset.get("catalog_owner", "Unknown")
+                        })
             return results
             
         except Exception as e:
             print(f"Search failed: {e}")
             return []
 
-    def get_structure(self, path: List[str] = None) -> Dict[str, Any]:
+    @catalog_access_decorator
+    def remove_from_category(
+        self,
+        category_name: str,
+        dataset_name: str,
+        access_key: int = -1
+    ) -> bool:
         """
-        Get the structure with dataset counts at a specific path or entire catalog.
+        Remove a dataset from a category.
         
         Args:
-            path (List[str], optional): Path to get structure for. None for entire catalog.
+            category_name (str): The category to remove the dataset from.
+            dataset_name (str): The name of the dataset to remove.
+            access_key (int): Catalog access key to verify permission.
             
         Returns:
-            Dict[str, Any]: Structure with dataset counts.
+            bool: Success status of the operation.
         """
-        def count_recursive(category: Dict[str, Any]) -> Dict[str, Any]:
-            result = {"dataset_count": len(category.get("datasets", []))}
-            
-            for key, value in category.items():
-                if key != "datasets" and isinstance(value, dict):
-                    result[key] = count_recursive(value)
-                    
-            return result
-
         try:
-            if path:
-                category = self._get_category_path(path)
-                if not category:
-                    return {}
-                return count_recursive(category)
-            
-            return {
-                category_name: count_recursive(category)
-                for category_name, category in self._categories.items()
-            }
-            
+            if category_name not in self.categories:
+                print(f"Category '{category_name}' not found.")
+                return False
+
+            # Check if user has permission to remove dataset
+            for dataset in self.categories[category_name]:
+                if (dataset["name"] == dataset_name and 
+                    dataset.get("catalog_owner") == DataCatalog.secured_access[access_key]):
+                    self.categories[category_name].remove(dataset)
+                    if self._save_categories():
+                        print(f"Dataset '{dataset_name}' removed from category '{category_name}'.")
+                        return True
+
+            print(f"Dataset '{dataset_name}' not found or you don't have permission to remove it.")
+            return False
+
         except Exception as e:
-            print(f"Failed to get structure: {e}")
-            return {}
-        
-        
+            print(f"Failed to remove dataset from category: {e}")
+            return False
