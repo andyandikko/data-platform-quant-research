@@ -168,8 +168,32 @@ class DataLake:
 
     @access_decorator
     def get_metadata(self, dataset_name: str, access_key: int = -1) -> Optional[Dict]:
-        """Retrieve metadata for a dataset."""
-        return self.metadata.get(dataset_name)
+        """
+        Retrieve metadata for a dataset. If metadata is not in memory, reload from the metadata file.
+
+        Args:
+            dataset_name (str): Name of the dataset.
+            access_key (int): Access key to access the metadata.
+
+        Returns:
+            Optional[Dict]: Metadata dictionary or None if not found.
+        """
+        # Check if metadata exists in memory
+        metadata = self.metadata.get(dataset_name)
+        if metadata:
+            return metadata
+
+        # Reload metadata from the file if not found in memory
+        print(f"Metadata for dataset '{dataset_name}' not found in memory. Reloading metadata from file...")
+        self.metadata = self._load_metadata()  # Reload metadata from the file
+
+        # Check again after reloading
+        metadata = self.metadata.get(dataset_name)
+        if metadata:
+            return metadata
+
+        print(f"Metadata for dataset '{dataset_name}' still not found after reloading.")
+        return None
 
     @access_decorator
     def delete_dataset(self, dataset_name: str, access_key: int = -1, processed: bool = False):

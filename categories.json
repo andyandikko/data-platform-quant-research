@@ -1,0 +1,204 @@
+{
+    "Market/Intraday": [
+        {
+            "name": "market_data_example",
+            "metadata": {
+                "model_type": "intraday",
+                "created_at": "2024-11-17T16:45:01.930555",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T16:45:01.937349",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp",
+                        "price",
+                        "volume",
+                        "symbol",
+                        "vwap",
+                        "volatility_20",
+                        "returns"
+                    ],
+                    "data_types": {
+                        "timestamp": "datetime64[ns]",
+                        "price": "float64",
+                        "volume": "int32",
+                        "symbol": "object",
+                        "vwap": "float64",
+                        "volatility_20": "float64",
+                        "returns": "float64"
+                    },
+                    "row_count": 43201,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ],
+    "News/Daily": [
+        {
+            "name": "news_data_example",
+            "metadata": {
+                "type": "news",
+                "processed": false,
+                "sentiment_analyzed": true,
+                "Author": "Andy",
+                "modification_time": "2024-11-17T16:45:05.692715",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp",
+                        "headline",
+                        "relevance",
+                        "source",
+                        "sentiment_score",
+                        "entities"
+                    ],
+                    "data_types": {
+                        "timestamp": "datetime64[ns]",
+                        "headline": "object",
+                        "relevance": "float64",
+                        "source": "object",
+                        "sentiment_score": "float64",
+                        "entities": "object"
+                    },
+                    "row_count": 31,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ],
+    "Configuration": [
+        {
+            "name": "config_data",
+            "metadata": {
+                "type": "configuration",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T16:45:05.781932",
+                "data_type": "dict",
+                "data_structure": {
+                    "data_type": "JSON-like",
+                    "item_count": 2
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ],
+    "Reports": [
+        {
+            "name": "report_data",
+            "metadata": {
+                "type": "analysis_report",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T16:45:05.789090",
+                "data_type": "str",
+                "data_structure": {
+                    "data_type": "Text/Binary"
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ],
+    "Analysis/SPY": [
+        {
+            "name": "spy_intraday",
+            "metadata": {
+                "model_type": "intraday",
+                "created_at": "2024-11-17T16:58:35.119571",
+                "ticker": "SPY",
+                "interval": "1m",
+                "start_date": "2024-11-15 09:30:00-05:00",
+                "end_date": "2024-11-15 15:59:00-05:00",
+                "rows": 389,
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T16:58:36.037777",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp",
+                        "price",
+                        "volume",
+                        "symbol",
+                        "open",
+                        "high",
+                        "low",
+                        "sma_20",
+                        "ema_20",
+                        "bollinger_upper",
+                        "rsi_14",
+                        "macd"
+                    ],
+                    "data_types": {
+                        "timestamp": "datetime64[ns, America/New_York]",
+                        "price": "float64",
+                        "volume": "int64",
+                        "symbol": "object",
+                        "open": "float64",
+                        "high": "float64",
+                        "low": "float64",
+                        "sma_20": "float64",
+                        "ema_20": "float64",
+                        "bollinger_upper": "float64",
+                        "rsi_14": "float64",
+                        "macd": "float64"
+                    },
+                    "row_count": 389,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ],
+    "EventStudy/Intraday": [
+        {
+            "name": "intraday_data",
+            "metadata": {
+                "type": "intraday",
+                "description": "Sample intraday data for event study",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T17:16:18.136824",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp\tprice\tvolume\tsymbol"
+                    ],
+                    "data_types": {
+                        "timestamp\tprice\tvolume\tsymbol": "object"
+                    },
+                    "row_count": 43201,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ],
+    "EventStudy/News": [
+        {
+            "name": "news_data",
+            "metadata": {
+                "type": "news",
+                "description": "Sample news data for event study",
+                "Author": "Andy",
+                "processed": false,
+                "modification_time": "2024-11-17T17:16:18.177753",
+                "data_type": "DataFrame",
+                "data_structure": {
+                    "columns": [
+                        "timestamp\theadline\trelevance\tsource"
+                    ],
+                    "data_types": {
+                        "timestamp\theadline\trelevance\tsource": "object"
+                    },
+                    "row_count": 31,
+                    "index": null
+                }
+            },
+            "catalog_owner": "Andy"
+        }
+    ]
+}
