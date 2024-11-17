@@ -1,0 +1,38 @@
+{
+    "test_clean_dataset": {
+        "Author": "Andy",
+        "processed": false,
+        "modification_time": "2024-11-16T23:55:38.719743",
+        "data_type": "DataFrame",
+        "data_structure": {
+            "columns": [
+                "id",
+                "value"
+            ],
+            "data_types": {
+                "id": "int64",
+                "value": "int64"
+            },
+            "row_count": 2,
+            "index": null
+        }
+    },
+    "test_transform_dataset": {
+        "Author": "Andy",
+        "processed": false,
+        "modification_time": "2024-11-16T23:55:38.735110",
+        "data_type": "DataFrame",
+        "data_structure": {
+            "columns": [
+                "id",
+                "value"
+            ],
+            "data_types": {
+                "id": "int64",
+                "value": "int64"
+            },
+            "row_count": 3,
+            "index": null
+        }
+    }
+}
