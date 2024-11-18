@@ -1,6 +1,6 @@
 # Data Platform for Quantitative Research
 
-This project is a collaborative effort to design and implement a data platform that simplifies the workflow for quantitative researchers. It includes:
+This project goal is to design and implement a data platform that simplifies the workflow for quantitative researchers. It includes:
 
 - **Data Lake**: A scalable storage solution for raw and processed data.
 - **Data Catalog**: Metadata-rich inventory for dataset discovery.
