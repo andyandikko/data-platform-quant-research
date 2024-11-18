@@ -3,6 +3,9 @@ Explanation of DataWorkbench Class
 
 The DataWorkbench class extends the functionality of the DataLake class to enhance data management capabilities by adding in-memory storage, transformation functionalities, and processing logs. It integrates well with the existing DataLake for seamless data retrieval and storage. Below is a concise explanation of its components and functionalities.
 
+Tested using unit tests (can refer for example usage). 
+
+ALternatively, the QuantAnalyst.py file showcases a comprehensive usage example and shows the entire inegration of DataLake with other classes.
 ---
 
 Key Features

@@ -3,7 +3,9 @@
 
 ## Overview
 The `DataLake` class provides a comprehensive framework for managing datasets in a file-based Data Lake. It allows for storing, retrieving, managing metadata, and querying datasets using SQL. The design emphasizes security via access keys and supports both raw and processed datasets.
-Note the security feature that restricts access to certain methods based on the access key provided. Tested using unit tests.
+Note the security feature that restricts access to certain methods based on the access key provided. Tested using unit tests (can refer for example usage). 
+
+ALternatively, the QuantAnalyst.py file showcases a comprehensive usage example and shows the entire inegration of DataLake with other classes.
 ---
 
 ## Key Features and Methods

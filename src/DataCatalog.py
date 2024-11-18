@@ -3,6 +3,10 @@
 
 The `DataCatalog` class extends the functionality of the `DataLake` class, providing enhanced features for managing datasets organized into categories. It introduces cataloging, searching, and security mechanisms to facilitate efficient dataset management.
 
+Tested using unit tests (can refer for example usage). 
+
+ALternatively, the QuantAnalyst.py file showcases a comprehensive usage example and shows the entire inegration of DataLake with other classes.
+
 ---
 
 #### Key Features

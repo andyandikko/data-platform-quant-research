@@ -5,6 +5,11 @@
 The `IntradayDataModel` and `NewsDataModel` are specialized Python classes designed to handle and analyze financial data. These models are part of a Quantitative Analysis platform that utilizes a modular approach with components like:
 - **DataWorkbench**: Handles data storage and retrieval.
 - **QuantModels**: Provides domain-specific data manipulation and analysis functionalities.
+ 
+
+Refer to the QuantAnalyst.py file which showcases a comprehensive usage example and shows the entire inegration of DataLake with other classes. 
+
+Also refer to the Event_study.py file which showcases the integration of NewsDataModel for event studies.
 
 ---
 
