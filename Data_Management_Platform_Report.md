@@ -1,5 +1,5 @@
 
-# **Academic Report on Data Management Platform: A Comprehensive System for Secure Data Handling and Analysis**
+# **Data Management Platform: A Comprehensive System for Secure Data Handling and Analysis for Quant research**
 
 ## **Abstract**
 This report presents a comprehensive data management platform that integrates components for secure storage, efficient cataloging, and advanced data analysis. The platform is designed to meet the needs of modern data-driven workflows, leveraging Python-based architectures such as `DataLake`, `DataWorkbench`, and `DataCatalog`. The system ensures secure access, streamlined data transformation, and insightful data querying, offering advanced features like sentiment analysis and technical indicator computation. This report elucidates the design, functionality, and integration of the components in detail.
